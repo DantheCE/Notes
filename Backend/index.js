@@ -23,7 +23,7 @@ let notes = [
 
 
 app.use(cors())
-app.use(express.statis('dist'))
+app.use(express.static('dist'))
 app.use(express.json())
 app.use(morgan('tiny'))
 
