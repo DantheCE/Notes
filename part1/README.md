@@ -52,7 +52,6 @@ src/             # Source code
    ```bash
    npm run dev
    ```
-3. Open your browser and navigate to `http://localhost:5173`.
 
 ### Building for Production
 
