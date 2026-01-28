@@ -13,14 +13,6 @@ app.use(express.json())
 app.use(morgan('tiny'))
 
 
-//helper function
-const generateId = () => {
-    const maxId = notes.length > 0 ? Math.max(
-        ...notes.map(n => Number(n.id))
-    ) : 0
-
-    return String(maxId + 1)
-}
 
 //default root
 app.get('/', (req, res) => {
@@ -71,14 +63,14 @@ app.post('/api/notes', (req, res) => {
     const note = new Note({
         content: body.content,
         important: body.important || false,
-        id: generateId(),
     })
 
     note.save().then(savedNote => {
         res.json(savedNote)
     })
     .catch(error => {
-        console.error("Note not saved")
+        console.error('Note not saved:', error)
+        res.status(500).json({ error: 'note saving failed' })
     })
 })
 
