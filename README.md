@@ -5,7 +5,6 @@ Full-stack application for managing notes with a Node.js backend and MongoDB dat
 ## Project Structure
 
 - `Backend/` - Express.js REST API server
-- `part1/` - Additional project components
 
 ## Quick Start
 
