@@ -30,4 +30,24 @@ noteSchema.set('toJSON', {
     }
 })
 
+noteSchema.pre('update', function(next){
+    this.setOptions({runValidators: true, context: 'query'})
+    next();
+})
+noteSchema.pre('FindOneAndupdate', function(next){
+    this.setOptions({runValidators: true, context: 'query'})
+    next();
+})
+noteSchema.pre('FindByIdAndupdate', function(next){
+    this.setOptions({runValidators: true, context: 'query'})
+    next();
+})
+noteSchema.pre('updateOne', function(next){
+    next();
+})
+noteSchema.pre('updateMany', function(next){
+    this.setOptions({runValidators: true, context: 'query'})
+    next();
+})
+
 module.exports = mongoose.model('Note', noteSchema)
