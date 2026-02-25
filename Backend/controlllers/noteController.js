@@ -2,13 +2,9 @@ const noteRouter = require('express').Router()
 const NoteModel = require('../models/note')
 
 // GET all notes
-noteRouter.get('/', (req, res) => {
-  NoteModel.find({}).then(notes => {
-    res.json(notes)
-  }).catch(error => {
-    console.log('error fetching notes', error)
-    res.status(500).json({ error: 'error fetching notes' })
-  })
+noteRouter.get('/', async (req, res) => {
+  const notes = await NoteModel.find({})
+  res.json(notes)
 })
 
 // GET a specific note
@@ -51,7 +47,7 @@ noteRouter.post('/', (req, res, next) => {
 
   note.save().then(savedNote => {
     console.log('note saved')
-    res.json(savedNote)
+    res.status(201).json(savedNote)
   })
     .catch(error => next(error))
 })

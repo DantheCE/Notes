@@ -2,6 +2,16 @@ POST http://localhost:3001/api/notes HTTP/1.1
 Content-Type: application/json
 
 {
-    "content": "This is a new note",
+    "content": "Learning Node.js and Express is really fun!",
+    "important": true
+}
+
+###
+
+POST http://localhost:3001/api/notes HTTP/1.1
+Content-Type: application/json
+
+{
+    "content": "MongoDB makes persisting data easy and flexible",
     "important": false
 }
