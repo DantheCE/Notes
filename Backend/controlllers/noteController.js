@@ -21,17 +21,13 @@ noteRouter.get('/:id', (req, res, next) => {
 })
 
 // DELETE a specific note
-noteRouter.delete('/:id', (req, res, next) => {
-  NoteModel.findByIdAndDelete(req.params.id)
-    .then(() => {
-      res.status(204).end()
-      console.log('note deleted')
-    })
-    .catch(error => next(error))
+noteRouter.delete('/:id', async (req, res) => {
+  await NoteModel.findByIdAndDelete(req.params.id)
+  res.status(204).end()
 })
 
 // POST - create a new note
-noteRouter.post('/', (req, res, next) => {
+noteRouter.post('/', async (req, res) => {
   const body = req.body
 
   if (!body.content) {
@@ -45,11 +41,8 @@ noteRouter.post('/', (req, res, next) => {
     important: body.important || false,
   })
 
-  note.save().then(savedNote => {
-    console.log('note saved')
-    res.status(201).json(savedNote)
-  })
-    .catch(error => next(error))
+  const savedNote = await note.save()
+  res.status(201).json(savedNote)
 })
 
 // PUT - update a specific note
