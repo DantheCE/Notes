@@ -8,16 +8,13 @@ noteRouter.get('/', async (req, res) => {
 })
 
 // GET a specific note
-noteRouter.get('/:id', (req, res, next) => {
-  NoteModel.findById(req.params.id)
-    .then(note => {
-      if (note) {
-        res.json(note)
-      } else {
-        res.status(404).end()
-      }
-    })
-    .catch(error => next(error))
+noteRouter.get('/:id', async (req, res) => {
+  const note = await NoteModel.findById(req.params.id)
+  if (note) {
+    res.json(note)
+  } else {
+    res.status(404).end()
+  }
 })
 
 // DELETE a specific note
@@ -46,25 +43,20 @@ noteRouter.post('/', async (req, res) => {
 })
 
 // PUT - update a specific note
-noteRouter.put('/:id', (req, res, next) => {
-  console.log(req.body)
+noteRouter.put('/:id', async (req, res) => {
   const { content, important } = req.body
 
-  NoteModel.findById(req.params.id)
-    .then(note => {
-      if (!note) {
-        console.log(note, 'nothing here')
-        return res.status(404).end()
-      }
+  const note = await NoteModel.findById(req.params.id)
+  if (!note) {
+    console.log(note, 'nothing here')
+    return res.status(404).end()
+  }
 
-      note.content = content
-      note.important = important
+  note.content = content
+  note.important = important
 
-      return note.save().then((updatedNote) => {
-        res.json(updatedNote)
-      })
-    })
-    .catch(error => next(error))
+  const updatedNote = await note.save()
+  res.status(200).json(updatedNote)
 })
 
 module.exports = noteRouter

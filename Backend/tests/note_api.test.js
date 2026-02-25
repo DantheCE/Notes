@@ -11,15 +11,11 @@ const api = supertest(app)
 
 beforeEach(async () => {
   await Note.deleteMany({})
-
-  let noteObject = new Note(helper.initialNotes[0])
-  await noteObject.save()
-
-  noteObject = new Note(helper.initialNotes[1])
-  await noteObject.save()
+  await Note.insertMany(helper.initialNotes)
 })
 
 describe('Format', () => {
+  console.log('entered tests')
   test('notes are returned as json', async() => {
     await api
       .get('/api/notes')
@@ -46,29 +42,15 @@ describe('GET endpoint', () => {
     const noteToView = notesAtStart[0]
 
     const resultNote = await api
-    .get(`/api/notes/${noteToView.id}`)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
+      .get(`/api/notes/${noteToView.id}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
 
     assert.deepStrictEqual(resultNote.body, noteToView)
   })
-  test('a note can be deleted', async () => {
-    const noteAtStart = await helper.notesInDb()
-    const noteToDelete = notesAtStart[0]
-
-    await api
-    .delete(`/api/notes/${noteToDelete.id}`)
-    .expect(204)
-
-    const notesAtEnd = await helper.notesInDb()
-    cost ids = notesAtEnd.map(n => n.id)
-    assert(!ids.includes(noteToDelete.id))
-
-    assert.strictEqual(notesAtEnd.length, helper.initialNotes.length - 1)
-  })
 })
 
-describe.only('POST endpoint', () => {
+describe('POST endpoint', () => {
   test('a valid note can be added', async () => {
     const newNote = {
       content: 'async/await simplifies making async calls',
@@ -88,7 +70,7 @@ describe.only('POST endpoint', () => {
     assert(contents.includes('async/await simplifies making async calls'))
   })
 
-  test.only('note without content is not added', async () => {
+  test('note without content is not added', async () => {
     const newNote = {
       important: true
     }
@@ -103,6 +85,44 @@ describe.only('POST endpoint', () => {
   })
 })
 
+describe('DELETE endpoint', () => {
+  test('a note can be deleted', async () => {
+    const notesAtStart = await helper.notesInDb()
+    const noteToDelete = notesAtStart[0]
+
+    await api
+      .delete(`/api/notes/${noteToDelete.id}`)
+      .expect(204)
+
+    const notesAtEnd = await helper.notesInDb()
+    const ids = notesAtEnd.map(n => n.id)
+    assert(!ids.includes(noteToDelete.id))
+
+    assert.strictEqual(notesAtEnd.length, helper.initialNotes.length - 1)
+  })
+
+})
+
+describe('PUT endpoint', () => {
+  test('a note can be updated', async () => {
+    const notesAtStart = await helper.notesInDb()
+    const noteToUpdate = notesAtStart[0]
+
+    const updatedNote = { ...noteToUpdate, important: true }
+
+    await api
+      .put(`/api/notes/${noteToUpdate.id}`)
+      .send(updatedNote)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const notesAfterOper = await helper.notesInDb()
+    const noteToCheck = notesAfterOper[0]
+
+    assert.strictEqual(noteToCheck.important, updatedNote.important)
+  }
+  )
+})
 
 after(async () => {
   await mongoose.connection.close()
