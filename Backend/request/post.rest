@@ -4,7 +4,7 @@ Content-Type: application/json
 {
     "content": "Note two for populate testing",
     "important": true,
-    "user": "69a0a8dea2362bb5c8b98ff6"
+    "user": "69a0adb4c8117f8520c9e3e5"
 }
 
 ###
@@ -15,5 +15,5 @@ Content-Type: application/json
 {
     "content": "Note three for populate testing",
     "important": false,
-    "user": "69a0a8dea2362bb5c8b98ff6"
+    "user": "69a0adb4c8117f8520c9e3e5"
 }
