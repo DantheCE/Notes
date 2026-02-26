@@ -24,6 +24,9 @@ userRouter.post('/', async (request, response, next) => {
       passwordHash,
     })
 
+    // attach the plain-text password so mongoose validators can inspect it
+    user.password = password
+
     const savedUser = await user.save()
 
     response.status(201).json(savedUser)

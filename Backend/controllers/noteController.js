@@ -1,5 +1,6 @@
 const noteRouter = require('express').Router()
 const NoteModel = require('../models/note')
+const UserModel = require('../models/user')
 
 // GET all notes
 noteRouter.get('/', async (req, res) => {
@@ -34,6 +35,11 @@ noteRouter.delete('/:id', async (req, res, next) => {
 // POST - create a new note
 noteRouter.post('/', async (req, res) => {
   const body = req.body
+  const user = await UserModel.findById(body.userId)
+
+  if (!user){
+    res.status(400).json({ error: 'userId missing or not valid`' })
+  }
 
   if (!body.content) {
     return res.status(400).json({
@@ -44,9 +50,13 @@ noteRouter.post('/', async (req, res) => {
   const note = new NoteModel({
     content: body.content,
     important: body.important || false,
+    user: user._id
   })
 
   const savedNote = await note.save()
+  user.notes = user.notes.concat(savedNote._id)
+  await user.save()
+
   res.status(201).json(savedNote)
 })
 
