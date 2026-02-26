@@ -4,6 +4,7 @@ const config = require('./utils/config')
 const logger = require('./utils/logger')
 const middleware = require('./utils/middleware')
 const noteRouter = require('./controlllers/noteController')
+const userRouter = require('./controlllers/userController')
 
 const app = express()
 
@@ -23,6 +24,7 @@ app.use(express.static('dist'))
 app.use(express.json())
 app.use(middleware.requestLogger)
 app.use('/api/notes', noteRouter)
+app.use('/api/users', userRouter)
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 
