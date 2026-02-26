@@ -4,7 +4,8 @@ const Note = require('../models/note')
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 
-const MONGODB_URL = process.env.MONGODB_URL
+// npm run dev sets NODE_ENV=test, so the server uses TEST_MONGODB_URL — match that here
+const MONGODB_URL = process.env.TEST_MONGODB_URL
 
 mongoose.connect(MONGODB_URL).then(async () => {
   // 1. Wipe both collections
@@ -12,13 +13,13 @@ mongoose.connect(MONGODB_URL).then(async () => {
   await User.deleteMany({})
   console.log('✅ Collections wiped.')
 
-  // 2. Create fresh user
+  // 2. Create fresh user with a name
   const passwordHash = await bcrypt.hash('secret123', 10)
   const user = new User({ username: 'daniel', name: 'Daniel', passwordHash })
   const savedUser = await user.save()
   console.log('USER_ID=' + savedUser._id.toString())
 
-  // 3. Create two notes for that user
+  // 3. Create two notes linked to that user
   const note1 = new Note({ content: 'MongoDB makes persisting data easy and flexible', important: false, user: savedUser._id })
   const savedNote1 = await note1.save()
   savedUser.notes = savedUser.notes.concat(savedNote1._id)
