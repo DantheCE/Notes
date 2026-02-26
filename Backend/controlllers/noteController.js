@@ -8,19 +8,27 @@ noteRouter.get('/', async (req, res) => {
 })
 
 // GET a specific note
-noteRouter.get('/:id', async (req, res) => {
-  const note = await NoteModel.findById(req.params.id)
-  if (note) {
-    res.json(note)
-  } else {
-    res.status(404).end()
+noteRouter.get('/:id', async (req, res, next) => {
+  try {
+    const note = await NoteModel.findById(req.params.id)
+    if (note) {
+      res.json(note)
+    } else {
+      res.status(404).end()
+    }
+  } catch (error) {
+    next(error)
   }
 })
 
 // DELETE a specific note
-noteRouter.delete('/:id', async (req, res) => {
-  await NoteModel.findByIdAndDelete(req.params.id)
-  res.status(204).end()
+noteRouter.delete('/:id', async (req, res, next) => {
+  try {
+    await NoteModel.findByIdAndDelete(req.params.id)
+    res.status(204).end()
+  } catch (error) {
+    next(error)
+  }
 })
 
 // POST - create a new note
@@ -43,20 +51,23 @@ noteRouter.post('/', async (req, res) => {
 })
 
 // PUT - update a specific note
-noteRouter.put('/:id', async (req, res) => {
+noteRouter.put('/:id', async (req, res, next) => {
   const { content, important } = req.body
 
-  const note = await NoteModel.findById(req.params.id)
-  if (!note) {
-    console.log(note, 'nothing here')
-    return res.status(404).end()
+  try {
+    const note = await NoteModel.findById(req.params.id)
+    if (!note) {
+      return res.status(404).end()
+    }
+
+    note.content = content
+    note.important = important
+
+    const updatedNote = await note.save()
+    res.status(200).json(updatedNote)
+  } catch (error) {
+    next(error)
   }
-
-  note.content = content
-  note.important = important
-
-  const updatedNote = await note.save()
-  res.status(200).json(updatedNote)
 })
 
 module.exports = noteRouter

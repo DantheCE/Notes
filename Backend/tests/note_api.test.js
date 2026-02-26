@@ -14,20 +14,13 @@ beforeEach(async () => {
   await Note.insertMany(helper.initialNotes)
 })
 
-describe('Format', () => {
-  console.log('entered tests')
-  test('notes are returned as json', async() => {
-    await api
-      .get('/api/notes')
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
-  })
-})
-
 describe('GET endpoint', () => {
 
-  test('all notes are returned' , async () => {
+  test('all notes are returned and are in json format' , async () => {
     const response = await api.get('/api/notes')
+      .expect('Content-Type', /application\/json/)
+      .expect(200)
+
     assert.strictEqual(response.body.length, helper.initialNotes.length)
   })
   test('a specific note is within the returned notes' , async () => {
@@ -47,6 +40,18 @@ describe('GET endpoint', () => {
       .expect('Content-Type', /application\/json/)
 
     assert.deepStrictEqual(resultNote.body, noteToView)
+  })
+
+  test('fails with statuscode 404 if note does not exist', async () => {
+    const validNonexistingId = await helper.nonExistingId()
+
+    await api.get(`/api/notes/${validNonexistingId}`).expect(404)
+  })
+
+  test('fails with statuscode 400 id is invalid', async () => {
+    const invalidId = '5a3d5da59070081a82a3445'
+
+    await api.get(`/api/notes/${invalidId}`).expect(400)
   })
 })
 
@@ -70,7 +75,7 @@ describe('POST endpoint', () => {
     assert(contents.includes('async/await simplifies making async calls'))
   })
 
-  test('note without content is not added', async () => {
+  test('note with invalid data is not added and returns 400', async () => {
     const newNote = {
       important: true
     }
@@ -86,7 +91,7 @@ describe('POST endpoint', () => {
 })
 
 describe('DELETE endpoint', () => {
-  test('a note can be deleted', async () => {
+  test('a note can be deleted and returns 204', async () => {
     const notesAtStart = await helper.notesInDb()
     const noteToDelete = notesAtStart[0]
 
