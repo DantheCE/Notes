@@ -4,14 +4,14 @@ const UserModel = require('../models/user')
 
 // GET all notes
 noteRouter.get('/', async (req, res) => {
-  const notes = await NoteModel.find({})
+  const notes = await NoteModel.find({}).populate('user', { username: 1, name: 1 })
   res.json(notes)
 })
 
 // GET a specific note
 noteRouter.get('/:id', async (req, res, next) => {
   try {
-    const note = await NoteModel.findById(req.params.id)
+    const note = await NoteModel.findById(req.params.id).populate('user', { username: 1, name: 1 })
     if (note) {
       res.json(note)
     } else {
@@ -33,31 +33,38 @@ noteRouter.delete('/:id', async (req, res, next) => {
 })
 
 // POST - create a new note
-noteRouter.post('/', async (req, res) => {
-  const body = req.body
-  const user = await UserModel.findById(body.userId)
+noteRouter.post('/', async (req, res, next) => {
+  try {
+    const body = req.body
+    console.log(body)
 
-  if (!user){
-    res.status(400).json({ error: 'userId missing or not valid`' })
-  }
+    if (!body.user) {
+      return res.status(400).json({ error: 'user missing' })
+    }
 
-  if (!body.content) {
-    return res.status(400).json({
-      error: 'content missing'
+    const user = await UserModel.findById(body.user)
+    if (!user) {
+      return res.status(400).json({ error: 'user not found' })
+    }
+
+    if (!body.content) {
+      return res.status(400).json({ error: 'content missing' })
+    }
+
+    const note = new NoteModel({
+      content: body.content,
+      important: body.important || false,
+      user: user._id
     })
+
+    const savedNote = await note.save()
+    user.notes = user.notes.concat(savedNote._id)
+    await user.save()
+
+    res.status(201).json(savedNote)
+  } catch (error) {
+    next(error)
   }
-
-  const note = new NoteModel({
-    content: body.content,
-    important: body.important || false,
-    user: user._id
-  })
-
-  const savedNote = await note.save()
-  user.notes = user.notes.concat(savedNote._id)
-  await user.save()
-
-  res.status(201).json(savedNote)
 })
 
 // PUT - update a specific note
