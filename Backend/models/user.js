@@ -26,6 +26,28 @@ userSchema.set('toJSON', {
   }
 })
 
+// Ensure validators run on update operations
+userSchema.pre('update', function (next) {
+  this.setOptions({ runValidators: true, context: 'query' })
+  next()
+})
+userSchema.pre('findOneAndUpdate', function (next) {
+  this.setOptions({ runValidators: true, context: 'query' })
+  next()
+})
+userSchema.pre('findByIdAndUpdate', function (next) {
+  this.setOptions({ runValidators: true, context: 'query' })
+  next()
+})
+userSchema.pre('updateOne', function (next) {
+  this.setOptions({ runValidators: true, context: 'query' })
+  next()
+})
+userSchema.pre('updateMany', function (next) {
+  this.setOptions({ runValidators: true, context: 'query' })
+  next()
+})
+
 const User = mongoose.model('User', userSchema)
 
 module.exports = User
