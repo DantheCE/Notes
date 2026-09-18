@@ -56,7 +56,7 @@ describe('when there is initially one user in db', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/)
 
-    assert(result.body.error.includes('is shorter than the minimum allowed length'))
+    assert(result.body.error.includes('Password must be at least 3 characters long'))
 
     const usersAtEnd = await helper.usersInDb()
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
@@ -77,7 +77,7 @@ describe('when there is initially one user in db', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/)
 
-    assert(result.body.error.includes('Password must be at least 3 characters long'))
+    assert(result.body.error.includes('Credentials do not match requirements (length)'))
 
     const usersAtEnd = await helper.usersInDb()
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
@@ -99,7 +99,7 @@ describe('when there is initially one user in db', () => {
       .expect('Content-Type', /application\/json/)
 
     const usersAtEnd = await helper.usersInDb()
-    assert(result.body.error.includes('expected `username` to be unique'))
+    assert(result.body.error.includes('Username already exists!'))
 
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
   })

@@ -12,6 +12,11 @@ const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: 'unknown endpoint' })
 }
 
+//there are various error responses littered across the codebase, especially within controllers
+//where exactly does out little errorHandler middleware participate in the app?
+//How are all these attributes of error defined? error.name decided by whatever upstream event's
+//modification of the object? like error.name = CastError do I set this myself or I'm listening to
+//someone or something out of my reach?
 const errorHandler = (error, req, res, next) => {
   console.error(error.message)
 
@@ -27,6 +32,12 @@ const errorHandler = (error, req, res, next) => {
         error: 'expected `username` to be unique'
       }
     )
+  }
+  else if (error.name === 'JsonWebTokenError') {
+    return res.status(401).json({ error: 'token invalid' })
+  }
+  else if (error.name === 'TokenExpiredError') {
+    return res.status(401).json({ error: 'token expired' })
   }
   next(error)
 }

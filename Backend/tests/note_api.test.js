@@ -106,6 +106,14 @@ describe('DELETE endpoint', () => {
     assert.strictEqual(notesAtEnd.length, helper.initialNotes.length - 1)
   })
 
+  test('fails with 404 if note doesn\'t exist', async () => {
+    const idNonExisting = helper.nonExistingId()
+
+    await api
+      .delete(`/api/notes/${idNonExisting}`)
+      .expect(404)
+  })
+
 })
 
 describe('PUT endpoint', () => {
